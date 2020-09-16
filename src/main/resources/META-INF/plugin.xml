@@ -1,0 +1,13 @@
+<idea-plugin>
+    <id>org.example.JBR</id>
+    <name>JBR_TEST</name>
+    <vendor email="popeskudenis@gmail.com">PDM</vendor>
+
+    <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.python</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <lang.inspectionSuppressor language="Python" implementationClass="PDInspectionSuppressor" />
+    </extensions>
+
+</idea-plugin>
