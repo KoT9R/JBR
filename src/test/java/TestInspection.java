@@ -21,10 +21,6 @@ public class TestInspection extends LightPlatformCodeInsightFixture4TestCase {
                 .toArray(InspectionProfileEntry[]::new);
         myFixture.enableInspections(inspections);
     }
-
-    /**
-     * Test that markers are suppressing errors
-     */
     @Test
     public void testErrorSuppression() {
         //language=Python
@@ -38,9 +34,6 @@ public class TestInspection extends LightPlatformCodeInsightFixture4TestCase {
         assertNoErrors("def foo(x: int):\n    x = 1");
     }
 
-    /**
-     * Tests that we're not suppressing more than we should
-     */
     @Test
     public void testNoErrorSuppression() {
         //language=Python

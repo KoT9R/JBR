@@ -8,6 +8,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <lang.inspectionSuppressor language="Python" implementationClass="PDInspectionSuppressor" />
+        <lang.inspectionSuppressor language="Python" implementationClass="PDInspectionSuppressorParameter" />
     </extensions>
 
 </idea-plugin>

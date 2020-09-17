@@ -6,12 +6,12 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.psi.PyElementGenerator
+import com.jetbrains.python.psi.PyNamedParameter
 import com.jetbrains.python.psi.PyTypeDeclarationStatement
 import org.jetbrains.annotations.Nls
 import org.jetbrains.annotations.NotNull
 
-
-class PDQuickFix : SuppressQuickFix {
+class PDQuickFixParameter : SuppressQuickFix {
     @Nls(capitalization = Nls.Capitalization.Sentence)
     @NotNull
     override fun getFamilyName(): String {
@@ -19,23 +19,18 @@ class PDQuickFix : SuppressQuickFix {
     }
 
     override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
-
         var anchor = descriptor.psiElement
         var expression = descriptor.psiElement
-
         var assignmentStr = ""
+
         while (anchor != null) {
             assignmentStr += anchor.text
             val next = PsiTreeUtil.nextLeaf(anchor)
             if (next != null && next.textContains(':')) {
                 return
             }
-            if (next != null && next.textContains('=')) {
-                assignmentStr = assignmentStr.dropLast(1)
+            if (next != null && (next.textContains(')') || next.textContains(',')) ) {
                 assignmentStr += ": int "
-                break
-            }
-            if (next != null && next.textContains('\n')) {
                 break
             }
             anchor = next
@@ -43,11 +38,9 @@ class PDQuickFix : SuppressQuickFix {
 
         val elementGenerator = PyElementGenerator.getInstance(project)
 
-        val assignment: PyTypeDeclarationStatement = elementGenerator.createFromText(LanguageLevel.PYTHON38, PyTypeDeclarationStatement::class.java,
-                assignmentStr)
-
-
+        val assignment: PyNamedParameter = elementGenerator.createParameter(assignmentStr)
         expression = expression.replace(assignment)
+
         if (expression == null) return
 
         CodeInsightUtilCore.forcePsiPostprocessAndRestoreElement(expression)
