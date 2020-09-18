@@ -23,10 +23,8 @@ dependencies {
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     version = '2020.2.1'
-    type = "PC"
     downloadSources = false
-
-    plugins 'PythonCore:202.6948.78'
+    setPlugins(project.properties["pythonPluginVersion"].toString())
 }
 patchPluginXml {
     changeNotes """

@@ -1,17 +1,15 @@
 import com.intellij.codeInsight.CodeInsightUtilCore
+import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.SuppressQuickFix
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
-import com.jetbrains.python.psi.LanguageLevel
-import com.jetbrains.python.psi.PyElementGenerator
-import com.jetbrains.python.psi.PyNamedParameter
-import com.jetbrains.python.psi.PyTypeDeclarationStatement
+import com.jetbrains.python.psi.*
 import org.jetbrains.annotations.Nls
 import org.jetbrains.annotations.NotNull
 
-class PDQuickFixParameter : SuppressQuickFix {
+class PDQuickFixParameter : LocalQuickFix {
     @Nls(capitalization = Nls.Capitalization.Sentence)
     @NotNull
     override fun getFamilyName(): String {
@@ -19,38 +17,21 @@ class PDQuickFixParameter : SuppressQuickFix {
     }
 
     override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
-        var anchor = descriptor.psiElement
-        var expression = descriptor.psiElement
-        var assignmentStr = ""
-
-        while (anchor != null) {
-            assignmentStr += anchor.text
-            val next = PsiTreeUtil.nextLeaf(anchor)
-            if (next != null && next.textContains(':')) {
-                return
-            }
-            if (next != null && (next.textContains(')') || next.textContains(',')) ) {
-                assignmentStr += ": int "
-                break
-            }
-            anchor = next
-        }
+        var parameters = descriptor.psiElement.children
 
         val elementGenerator = PyElementGenerator.getInstance(project)
 
-        val assignment: PyNamedParameter = elementGenerator.createParameter(assignmentStr)
-        expression = expression.replace(assignment)
+        for (param in parameters) {
+            if (param.children.isNotEmpty() && param.children[0] is PyAnnotation) {
+                continue
+            } else {
+                var expression = param
+                val assignment: PyNamedParameter = elementGenerator.createParameter(param.text + ": int")
+                expression = expression.replace(assignment)
+                if (expression == null) return
+                CodeInsightUtilCore.forcePsiPostprocessAndRestoreElement(expression)
+            }
 
-        if (expression == null) return
-
-        CodeInsightUtilCore.forcePsiPostprocessAndRestoreElement(expression)
-    }
-
-    override fun isAvailable(p0: Project, p1: PsiElement): Boolean {
-        return true
-    }
-
-    override fun isSuppressAll(): Boolean {
-        return false
+        }
     }
 }

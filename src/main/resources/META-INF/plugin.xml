@@ -4,11 +4,6 @@
     <vendor email="popeskudenis@gmail.com">PDM</vendor>
 
     <depends>com.intellij.modules.lang</depends>
-    <depends>com.intellij.modules.python</depends>
-
-    <extensions defaultExtensionNs="com.intellij">
-        <lang.inspectionSuppressor language="Python" implementationClass="PDInspectionSuppressor" />
-        <lang.inspectionSuppressor language="Python" implementationClass="PDInspectionSuppressorParameter" />
-    </extensions>
+    <depends optional="true" config-file="python-config.xml">com.intellij.modules.python</depends>
 
 </idea-plugin>

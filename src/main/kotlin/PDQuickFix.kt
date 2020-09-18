@@ -1,4 +1,5 @@
 import com.intellij.codeInsight.CodeInsightUtilCore
+import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.SuppressQuickFix
 import com.intellij.openapi.project.Project
@@ -11,53 +12,24 @@ import org.jetbrains.annotations.Nls
 import org.jetbrains.annotations.NotNull
 
 
-class PDQuickFix : SuppressQuickFix {
+class PDQuickFix : LocalQuickFix {
     @Nls(capitalization = Nls.Capitalization.Sentence)
     @NotNull
     override fun getFamilyName(): String {
-        return "Replace to int"
+        return "Add type int"
     }
 
     override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
-
-        var anchor = descriptor.psiElement
-        var expression = descriptor.psiElement
-
-        var assignmentStr = ""
-        while (anchor != null) {
-            assignmentStr += anchor.text
-            val next = PsiTreeUtil.nextLeaf(anchor)
-            if (next != null && next.textContains(':')) {
-                return
-            }
-            if (next != null && next.textContains('=')) {
-                assignmentStr = assignmentStr.dropLast(1)
-                assignmentStr += ": int "
-                break
-            }
-            if (next != null && next.textContains('\n')) {
-                break
-            }
-            anchor = next
-        }
+        var anchor = descriptor.psiElement.children[0]
 
         val elementGenerator = PyElementGenerator.getInstance(project)
 
         val assignment: PyTypeDeclarationStatement = elementGenerator.createFromText(LanguageLevel.PYTHON38, PyTypeDeclarationStatement::class.java,
-                assignmentStr)
+                anchor.text + ": int")
 
+        anchor = anchor.replace(assignment)
+        if (anchor == null) return
 
-        expression = expression.replace(assignment)
-        if (expression == null) return
-
-        CodeInsightUtilCore.forcePsiPostprocessAndRestoreElement(expression)
-    }
-
-    override fun isAvailable(p0: Project, p1: PsiElement): Boolean {
-        return true
-    }
-
-    override fun isSuppressAll(): Boolean {
-        return false
+        CodeInsightUtilCore.forcePsiPostprocessAndRestoreElement(anchor)
     }
 }
