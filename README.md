@@ -28,3 +28,28 @@ x: int = 1
 ```
 
 #Install
+Create Gradle project in IDEA (Please select in frameworks Java, Kotlin/JVM, and Intellij Platform Plugin)
+
+Download the repository
+
+Clean the project.
+```shell script
+$ gradle clean
+```
+
+Run the Gradle fatJar task.
+
+```shell script
+$ gradle fatJar
+```
+The Jar is create under the $project/build/libs/ folder.
+
+Open PyCharm Community
+
+Go to Preferences - Plugin
+
+Click on the gear
+
+Please select "Install Plugin from disk..."
+
+Select the generated .jar file
